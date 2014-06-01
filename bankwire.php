@@ -216,7 +216,7 @@ class BankWire extends PaymentModule
 					),
 				),
 				'submit' => array(
-					'title' => $this->l('Save'),
+					'title' => $this->l('Add New Account'),
 				)
 			),
 		);
