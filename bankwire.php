@@ -77,7 +77,16 @@ class BankWire extends PaymentModule
 	{
 		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn'))
 			return false;
-		return true;
+		return Db::getInstance()->execute('
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'bankwire` (
+			`id` int(6) NOT NULL AUTO_INCREMENT,
+			`id_shop` INTEGER UNSIGNED NOT NULL DEFAULT \'1\',
+			`id_shop_group` INTEGER UNSIGNED NOT NULL DEFAULT \'1\',
+			`owner` varchar(255) NOT NULL,
+			`details` text NOT NULL,
+			`address` text NOT NULL,
+			PRIMARY KEY(`id`)
+		) ENGINE='._MYSQL_ENGINE_.' default CHARSET=utf8');
 	}
 
 	public function uninstall()
