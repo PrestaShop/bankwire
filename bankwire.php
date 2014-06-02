@@ -91,12 +91,8 @@ class BankWire extends PaymentModule
 
 	public function uninstall()
 	{
-		if (!Configuration::deleteByName('BANK_WIRE_DETAILS')
-				|| !Configuration::deleteByName('BANK_WIRE_OWNER')
-				|| !Configuration::deleteByName('BANK_WIRE_ADDRESS')
-				|| !parent::uninstall())
-			return false;
-		return true;
+		Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.'bankwire');
+		return parent::uninstall();
 	}
 
 	private function _postValidation()
@@ -112,11 +108,21 @@ class BankWire extends PaymentModule
 
 	private function _postProcess()
 	{
-		if (Tools::isSubmit('btnSubmit'))
-		{
-			Configuration::updateValue('BANK_WIRE_DETAILS', Tools::getValue('BANK_WIRE_DETAILS'));
-			Configuration::updateValue('BANK_WIRE_OWNER', Tools::getValue('BANK_WIRE_OWNER'));
-			Configuration::updateValue('BANK_WIRE_ADDRESS', Tools::getValue('BANK_WIRE_ADDRESS'));
+		// if (Tools::isSubmit('btnSubmit'))
+		// {
+		// 	Configuration::updateValue('BANK_WIRE_DETAILS', Tools::getValue('BANK_WIRE_DETAILS'));
+		// 	Configuration::updateValue('BANK_WIRE_OWNER', Tools::getValue('BANK_WIRE_OWNER'));
+		// 	Configuration::updateValue('BANK_WIRE_ADDRESS', Tools::getValue('BANK_WIRE_ADDRESS'));
+		// }
+		if (Tools::isSubmit('btnSubmit')) {
+			Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'bankwire (id_shop, id_shop_group, owner, details, address)
+					VALUES
+					('.$this->context->shop->id.',
+					'.$this->context->shop->id_shop_group.',\''
+					.Tools::getValue('BANK_WIRE_OWNER').'\',\''
+					.Tools::getValue('BANK_WIRE_DETAILS').'\',\''
+					.Tools::getValue('BANK_WIRE_ADDRESS').'\'
+					)') or die(Db::getInstance()->getMsgError());
 		}
 		$this->_html .= $this->displayConfirmation($this->l('Settings updated'));
 	}
