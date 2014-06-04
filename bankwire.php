@@ -148,6 +148,7 @@ class BankWire extends PaymentModule
 		
 		$this->_html .= $this->_displayBankWire();
 		$this->_html .= $this->renderForm();
+		$this->_html .= $this->renderList();
 
 		return $this->_html;
 	}
@@ -257,6 +258,45 @@ class BankWire extends PaymentModule
 		return $helper->generateForm(array($fields_form));
 	}
 	
+
+	public function renderList() {
+		$records_table = array(
+				'id' => array(
+					'title' => $this->l('id'),
+					'width' => 140,
+            		'type' => 'text',
+					),
+				'owner' => array(
+					'title' => $this->l('Owner'),
+					'width' => 140,
+            		'type' => 'text',
+					),
+				'details' => array(
+					'title' => $this->l('Details'),
+					'width' => 140,
+            		'type' => 'text',
+					),
+				'bankaddress' => array(
+					'title' => $this->l('Bank Address'),
+					'width' => 140,
+            		'type' => 'text',
+					)
+			);
+
+		$helper = new HelperList();
+		$helper->shopLinkType = '';
+		$helper->icon = "icon-envelope";
+		$helper->simple_header = false;
+		$this->records_table = array();
+	    $helper->actions = array('edit', 'delete');
+	    $helper->identifier = $this->identifier;
+	    $helper->show_toolbar = true;
+	    $helper->title = $this->l('Existing Accounts');
+
+	    $helper->token = Tools::getAdminTokenLite('AdminModules');
+    	$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
+	    return $helper->generateList(array($records_table));
+	}
 	public function getConfigFieldsValues()
 	{
 		return array(
