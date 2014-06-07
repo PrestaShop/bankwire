@@ -93,12 +93,6 @@ class BankWire extends PaymentModule
 
 	private function _postProcess()
 	{
-		// if (Tools::isSubmit('btnSubmit'))
-		// {
-		// 	Configuration::updateValue('BANK_WIRE_DETAILS', Tools::getValue('BANK_WIRE_DETAILS'));
-		// 	Configuration::updateValue('BANK_WIRE_OWNER', Tools::getValue('BANK_WIRE_OWNER'));
-		// 	Configuration::updateValue('BANK_WIRE_ADDRESS', Tools::getValue('BANK_WIRE_ADDRESS'));
-		// }
 		if (Tools::isSubmit('btnSubmit')) {
 			Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'bankwire (id_shop, id_shop_group, owner, details, address)
 					VALUES
