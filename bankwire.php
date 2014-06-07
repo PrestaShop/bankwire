@@ -124,7 +124,8 @@ class BankWire extends PaymentModule
 					.Tools::getValue('BANK_WIRE_ADDRESS').'\'
 					)') or die(Db::getInstance()->getMsgError());
 		}
-		$this->_html .= $this->displayConfirmation($this->l('Settings updated'));
+
+		$this->_html .= $this->displayConfirmation($this->l('New Account added successfully'));
 	}
 
 	private function _displayBankWire()
@@ -143,9 +144,14 @@ class BankWire extends PaymentModule
 				foreach ($this->_postErrors as $err)
 					$this->_html .= $this->displayError($err);
 		}
+		elseif (Tools::isSubmit('deletebankwire'))
+		{
+			//action button of helper list "delete" was pressed
+			$this->deleterow(Tools::getValue('id'));
+		}
 		else
 			$this->_html .= '<br />';
-		
+
 		$this->_html .= $this->_displayBankWire();
 		$this->_html .= $this->renderForm();
 		$this->_html .= $this->renderList();
@@ -239,7 +245,7 @@ class BankWire extends PaymentModule
 		
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
-		$helper->table =  $this->table;
+		//$helper->table =  $this->table;
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
@@ -261,41 +267,42 @@ class BankWire extends PaymentModule
 
 	public function renderList() {
 		$records_table = array(
-				'id' => array(
-					'title' => $this->l('id'),
-					'width' => 140,
-            		'type' => 'text',
-					),
-				'owner' => array(
-					'title' => $this->l('Owner'),
-					'width' => 140,
-            		'type' => 'text',
-					),
-				'details' => array(
-					'title' => $this->l('Details'),
-					'width' => 140,
-            		'type' => 'text',
-					),
-				'bankaddress' => array(
-					'title' => $this->l('Bank Address'),
-					'width' => 140,
-            		'type' => 'text',
-					)
+					'id' => array(
+						'title' => $this->l('Id'),
+						'width' => 140,
+	            		'type' => 'text',
+						),
+					'owner' => array(
+						'title' => $this->l('Account Owner'),
+						'width' => 140,
+	            		'type' => 'text',
+						),
+					'details' => array(
+						'title' => $this->l('Details'),
+						'width' => 140,
+	            		'type' => 'text',
+						),
+					'address' => array(
+						'title' => $this->l('Bank address'),
+						'width' => 140,
+	            		'type' => 'text',
+						)
 			);
 
 		$helper = new HelperList();
 		$helper->shopLinkType = '';
-		$helper->icon = "icon-envelope";
-		$helper->simple_header = false;
-		$this->records_table = array();
-	    $helper->actions = array('edit', 'delete');
-	    $helper->identifier = $this->identifier;
+		$helper->simple_header = true;
+		$helper->_select = $this->getBankAccounts();
+	    $helper->actions = array('delete');
+	    $helper->identifier = 'id';
 	    $helper->show_toolbar = true;
+	    $helper->_defaultOrderBy = 'id';
 	    $helper->title = $this->l('Existing Accounts');
 
 	    $helper->token = Tools::getAdminTokenLite('AdminModules');
     	$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-	    return $helper->generateList(array($records_table));
+    	$helper->table = "bankwire";
+	    return $helper->generateList($helper->_select, $records_table);
 	}
 	public function getConfigFieldsValues()
 	{
@@ -304,5 +311,19 @@ class BankWire extends PaymentModule
 			'BANK_WIRE_OWNER' => Tools::getValue('BANK_WIRE_OWNER', Configuration::get('BANK_WIRE_OWNER')),
 			'BANK_WIRE_ADDRESS' => Tools::getValue('BANK_WIRE_ADDRESS', Configuration::get('BANK_WIRE_ADDRESS')),
 		);
+	}
+
+	public function getBankAccounts() {
+		$sql = 'SELECT *
+		FROM '._DB_PREFIX_.'bankwire';
+		return Db::getInstance()->executeS($sql);
+	}
+
+	public function deleterow($id) {
+		if ($id != null)
+		{
+			Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'bankwire WHERE `id` = '.$id);
+			$this->_html .= $this->displayConfirmation($this->l('Bank Account was deleted successfully'));
+		}	
 	}
 }
