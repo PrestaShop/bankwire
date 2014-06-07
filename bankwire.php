@@ -32,9 +32,6 @@ class BankWire extends PaymentModule
 	private $_html = '';
 	private $_postErrors = array();
 
-	public $details;
-	public $owner;
-	public $address;
 	public $extra_mail_vars;
 	public function __construct()
 	{
@@ -47,14 +44,6 @@ class BankWire extends PaymentModule
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';
 
-		$config = Configuration::getMultiple(array('BANK_WIRE_DETAILS', 'BANK_WIRE_OWNER', 'BANK_WIRE_ADDRESS'));
-		if (!empty($config['BANK_WIRE_OWNER']))
-			$this->owner = $config['BANK_WIRE_OWNER'];
-		if (!empty($config['BANK_WIRE_DETAILS']))
-			$this->details = $config['BANK_WIRE_DETAILS'];
-		if (!empty($config['BANK_WIRE_ADDRESS']))
-			$this->address = $config['BANK_WIRE_ADDRESS'];
-
 		$this->bootstrap = true;
 		parent::__construct();	
 
@@ -66,11 +55,7 @@ class BankWire extends PaymentModule
 		if (!count(Currency::checkPaymentCurrencies($this->id)))
 			$this->warning = $this->l('No currency has been set for this module.');
 
-		$this->extra_mail_vars = array(
-										'{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
-										'{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
-										'{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
-										);
+		$this->extra_mail_vars = $this->getBankAccounts();
 	}
 
 	public function install()
@@ -254,7 +239,6 @@ class BankWire extends PaymentModule
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->tpl_vars = array(
-			'fields_value' => $this->getConfigFieldsValues(),
 			'languages' => $this->context->controller->getLanguages(),
 			'id_language' => $this->context->language->id
 		);
@@ -301,14 +285,6 @@ class BankWire extends PaymentModule
     	$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
     	$helper->table = "bankwire";
 	    return $helper->generateList($helper->_select, $records_table);
-	}
-	public function getConfigFieldsValues()
-	{
-		return array(
-			'BANK_WIRE_DETAILS' => Tools::getValue('BANK_WIRE_DETAILS', Configuration::get('BANK_WIRE_DETAILS')),
-			'BANK_WIRE_OWNER' => Tools::getValue('BANK_WIRE_OWNER', Configuration::get('BANK_WIRE_OWNER')),
-			'BANK_WIRE_ADDRESS' => Tools::getValue('BANK_WIRE_ADDRESS', Configuration::get('BANK_WIRE_ADDRESS')),
-		);
 	}
 
 	public function getBankAccounts() {
