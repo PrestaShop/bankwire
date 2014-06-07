@@ -185,9 +185,7 @@ class BankWire extends PaymentModule
 		{
 			$this->smarty->assign(array(
 				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
-				'bankwireDetails' => Tools::nl2br($this->details),
-				'bankwireAddress' => Tools::nl2br($this->address),
-				'bankwireOwner' => $this->owner,
+				'bankAccounts' => $this->getBankAccounts(),
 				'status' => 'ok',
 				'id_order' => $params['objOrder']->id
 			));
