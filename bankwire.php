@@ -32,9 +32,6 @@ class BankWire extends PaymentModule
 	private $_html = '';
 	private $_postErrors = array();
 
-	public $details;
-	public $owner;
-	public $address;
 	public $extra_mail_vars;
 	public function __construct()
 	{
@@ -47,14 +44,6 @@ class BankWire extends PaymentModule
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';
 
-		$config = Configuration::getMultiple(array('BANK_WIRE_DETAILS', 'BANK_WIRE_OWNER', 'BANK_WIRE_ADDRESS'));
-		if (!empty($config['BANK_WIRE_OWNER']))
-			$this->owner = $config['BANK_WIRE_OWNER'];
-		if (!empty($config['BANK_WIRE_DETAILS']))
-			$this->details = $config['BANK_WIRE_DETAILS'];
-		if (!empty($config['BANK_WIRE_ADDRESS']))
-			$this->address = $config['BANK_WIRE_ADDRESS'];
-
 		$this->bootstrap = true;
 		parent::__construct();	
 
@@ -66,28 +55,29 @@ class BankWire extends PaymentModule
 		if (!count(Currency::checkPaymentCurrencies($this->id)))
 			$this->warning = $this->l('No currency has been set for this module.');
 
-		$this->extra_mail_vars = array(
-										'{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
-										'{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
-										'{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
-										);
+		$this->extra_mail_vars = $this->getBankAccounts();
 	}
 
 	public function install()
 	{
 		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn'))
 			return false;
-		return true;
+		return Db::getInstance()->execute('
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'bankwire` (
+			`id` int(6) NOT NULL AUTO_INCREMENT,
+			`id_shop` INTEGER UNSIGNED NOT NULL DEFAULT \'1\',
+			`id_shop_group` INTEGER UNSIGNED NOT NULL DEFAULT \'1\',
+			`owner` varchar(255) NOT NULL,
+			`details` text NOT NULL,
+			`address` text NOT NULL,
+			PRIMARY KEY(`id`)
+		) ENGINE='._MYSQL_ENGINE_.' default CHARSET=utf8');
 	}
 
 	public function uninstall()
 	{
-		if (!Configuration::deleteByName('BANK_WIRE_DETAILS')
-				|| !Configuration::deleteByName('BANK_WIRE_OWNER')
-				|| !Configuration::deleteByName('BANK_WIRE_ADDRESS')
-				|| !parent::uninstall())
-			return false;
-		return true;
+		Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.'bankwire');
+		return parent::uninstall();
 	}
 
 	private function _postValidation()
@@ -103,13 +93,18 @@ class BankWire extends PaymentModule
 
 	private function _postProcess()
 	{
-		if (Tools::isSubmit('btnSubmit'))
-		{
-			Configuration::updateValue('BANK_WIRE_DETAILS', Tools::getValue('BANK_WIRE_DETAILS'));
-			Configuration::updateValue('BANK_WIRE_OWNER', Tools::getValue('BANK_WIRE_OWNER'));
-			Configuration::updateValue('BANK_WIRE_ADDRESS', Tools::getValue('BANK_WIRE_ADDRESS'));
+		if (Tools::isSubmit('btnSubmit')) {
+			Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'bankwire (id_shop, id_shop_group, owner, details, address)
+					VALUES
+					('.$this->context->shop->id.',
+					'.$this->context->shop->id_shop_group.',\''
+					.Tools::getValue('BANK_WIRE_OWNER').'\',\''
+					.Tools::getValue('BANK_WIRE_DETAILS').'\',\''
+					.Tools::getValue('BANK_WIRE_ADDRESS').'\'
+					)') or die(Db::getInstance()->getMsgError());
 		}
-		$this->_html .= $this->displayConfirmation($this->l('Settings updated'));
+
+		$this->_html .= $this->displayConfirmation($this->l('New Account added successfully'));
 	}
 
 	private function _displayBankWire()
@@ -128,11 +123,17 @@ class BankWire extends PaymentModule
 				foreach ($this->_postErrors as $err)
 					$this->_html .= $this->displayError($err);
 		}
+		elseif (Tools::isSubmit('deletebankwire'))
+		{
+			//action button of helper list "delete" was pressed
+			$this->deleterow(Tools::getValue('id'));
+		}
 		else
 			$this->_html .= '<br />';
-		
+
 		$this->_html .= $this->_displayBankWire();
 		$this->_html .= $this->renderForm();
+		$this->_html .= $this->renderList();
 
 		return $this->_html;
 	}
@@ -163,9 +164,7 @@ class BankWire extends PaymentModule
 		{
 			$this->smarty->assign(array(
 				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
-				'bankwireDetails' => Tools::nl2br($this->details),
-				'bankwireAddress' => Tools::nl2br($this->address),
-				'bankwireOwner' => $this->owner,
+				'bankAccounts' => $this->getBankAccounts(),
 				'status' => 'ok',
 				'id_order' => $params['objOrder']->id
 			));
@@ -216,14 +215,14 @@ class BankWire extends PaymentModule
 					),
 				),
 				'submit' => array(
-					'title' => $this->l('Save'),
+					'title' => $this->l('Add New Account'),
 				)
 			),
 		);
 		
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
-		$helper->table =  $this->table;
+		//$helper->table =  $this->table;
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
@@ -234,7 +233,6 @@ class BankWire extends PaymentModule
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->tpl_vars = array(
-			'fields_value' => $this->getConfigFieldsValues(),
 			'languages' => $this->context->controller->getLanguages(),
 			'id_language' => $this->context->language->id
 		);
@@ -242,12 +240,58 @@ class BankWire extends PaymentModule
 		return $helper->generateForm(array($fields_form));
 	}
 	
-	public function getConfigFieldsValues()
-	{
-		return array(
-			'BANK_WIRE_DETAILS' => Tools::getValue('BANK_WIRE_DETAILS', Configuration::get('BANK_WIRE_DETAILS')),
-			'BANK_WIRE_OWNER' => Tools::getValue('BANK_WIRE_OWNER', Configuration::get('BANK_WIRE_OWNER')),
-			'BANK_WIRE_ADDRESS' => Tools::getValue('BANK_WIRE_ADDRESS', Configuration::get('BANK_WIRE_ADDRESS')),
-		);
+
+	public function renderList() {
+		$records_table = array(
+					'id' => array(
+						'title' => $this->l('Id'),
+						'width' => 140,
+	            		'type' => 'text',
+						),
+					'owner' => array(
+						'title' => $this->l('Account Owner'),
+						'width' => 140,
+	            		'type' => 'text',
+						),
+					'details' => array(
+						'title' => $this->l('Details'),
+						'width' => 140,
+	            		'type' => 'text',
+						),
+					'address' => array(
+						'title' => $this->l('Bank address'),
+						'width' => 140,
+	            		'type' => 'text',
+						)
+			);
+
+		$helper = new HelperList();
+		$helper->shopLinkType = '';
+		$helper->simple_header = true;
+		$helper->_select = $this->getBankAccounts();
+	    $helper->actions = array('delete');
+	    $helper->identifier = 'id';
+	    $helper->show_toolbar = true;
+	    $helper->_defaultOrderBy = 'id';
+	    $helper->title = $this->l('Existing Accounts');
+
+	    $helper->token = Tools::getAdminTokenLite('AdminModules');
+    	$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
+    	$helper->table = "bankwire";
+	    return $helper->generateList($helper->_select, $records_table);
+	}
+
+	public function getBankAccounts() {
+		$sql = 'SELECT *
+		FROM '._DB_PREFIX_.'bankwire';
+		return Db::getInstance()->executeS($sql);
+	}
+
+	public function deleterow($id) {
+		if ($id != null)
+		{
+			Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'bankwire WHERE `id` = '.$id);
+			$this->_html .= $this->displayConfirmation($this->l('Bank Account was deleted successfully'));
+		}	
 	}
 }

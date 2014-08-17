@@ -28,9 +28,13 @@
 		<br /><br />
 		{l s='Please send us a bank wire with' mod='bankwire'}
 		<br /><br />- {l s='Amount' mod='bankwire'} <span class="price"> <strong>{$total_to_pay}</strong></span>
-		<br /><br />- {l s='Name of account owner' mod='bankwire'}  <strong>{if $bankwireOwner}{$bankwireOwner}{else}___________{/if}</strong>
-		<br /><br />- {l s='Include these details' mod='bankwire'}  <strong>{if $bankwireDetails}{$bankwireDetails}{else}___________{/if}</strong>
-		<br /><br />- {l s='Bank name' mod='bankwire'}  <strong>{if $bankwireAddress}{$bankwireAddress}{else}___________{/if}</strong>
+		<br /><br />{l s='on one of the following accounts' mod='bankwire'}:
+		{foreach from=$bankAccounts item=account}
+		<br />
+			<br>-- {l s='Owner' mod='bankwire'}: <strong>{$account.owner}</strong>
+			<br>-- {l s='Details' mod='bankwire'}: <strong>{$account.details}</strong>
+			<br>-- {l s='Bank Name' mod='bankwire'}: <strong>{$account.address}</strong>
+		{/foreach}
 		{if !isset($reference)}
 			<br /><br />- {l s='Do not forget to insert your order number #%d in the subject of your bank wire' sprintf=$id_order mod='bankwire'}
 		{else}
