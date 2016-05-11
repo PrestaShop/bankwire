@@ -25,20 +25,6 @@
 
 {if $status == 'ok'}
 	<p>{l s='Your order on %s is complete.' sprintf=[$shop_name] mod='bankwire'}
-	<p>{l s='Please send us a bank wire with:' mod='bankwire'}
-		<dl>
-			<dt>{l s='Amount' mod='bankwire'}</dt>
-			<dd>{$total}</dd>
-			<dt>{l s='Name of account owner' mod='bankwire'}</dt>
-			<dd>{$bankwireOwner}</dd>
-			<dt>{l s='Please include these details' mod='bankwire'}</dt>
-			<dd>{$bankwireDetails}</dd>
-			<dt>{l s='Bank name' mod='bankwire'}</dt>
-			<dd>{$bankwireAddress}</dd>
-			<dt>{l s='Order reference' mod='bankwire'}</dt>
-			<dd>{$reference}</dd>
-		</dl>
-	</p>
 	<p>{l s='We\'ve also sent you this information by e-mail.' mod='bankwire'}</p>
 	<strong>{l s='Your order will be sent as soon as we receive payment.' mod='bankwire'}</strong>
 	<p>
