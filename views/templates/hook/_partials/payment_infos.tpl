@@ -23,9 +23,14 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<p class="payment_module">
-	<a href="{$link->getModuleLink('bankwire', 'payment')|escape:'html'}" title="{l s='Pay by bank wire' d='Modules.BankWire.Shop'}">
-		<img src="{$this_path_bw}bankwire.jpg" alt="{l s='Pay by bank wire' d='Modules.BankWire.Shop'}" width="86" height="49"/>
-		{l s='Pay by bank wire' d='Modules.BankWire.Shop'}&nbsp;<span>{l s='(order processing will be longer)' d='Modules.BankWire.Shop'}</span>
-	</a>
-</p>
+
+<dl>
+    <dt>{l s='Amount' mod='bankwire'}</dt>
+    <dd>{$total}</dd>
+    <dt>{l s='Name of account owner' mod='bankwire'}</dt>
+    <dd>{$bankwireOwner}</dd>
+    <dt>{l s='Please include these details' mod='bankwire'}</dt>
+    <dd>{$bankwireDetails}</dd>
+    <dt>{l s='Bank name' mod='bankwire'}</dt>
+    <dd>{$bankwireAddress nofilter}</dd>
+</dl>
