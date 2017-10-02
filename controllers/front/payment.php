@@ -46,7 +46,7 @@ class BankwirePaymentModuleFrontController extends ModuleFrontController
 		$this->context->smarty->assign(array(
 			'nbProducts' => $cart->nbProducts(),
 			'cust_currency' => $cart->id_currency,
-			'currencies' => $this->module->getCurrency((int)$cart->id_currency),
+			'currencies' => Currency::getCurrenciesByIdShop((int)$cart->id_shop),
 			'total' => $cart->getOrderTotal(true, Cart::BOTH),
 			'this_path' => $this->module->getPathUri(),
 			'this_path_bw' => $this->module->getPathUri(),
