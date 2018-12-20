@@ -27,9 +27,9 @@
 /**
  * @deprecated 1.5.0 This file is deprecated, use moduleFrontController instead
  */
-include(__DIR__ . '/../../config/config.inc.php');
-include(__DIR__ . '/../../header.php');
-include(__DIR__ . '/../../init.php');
+include __DIR__ . '/../../config/config.inc.php';
+include __DIR__ . '/../../header.php';
+include __DIR__ . '/../../init.php';
 
 $context = Context::getContext();
 $cart = $context->cart;
