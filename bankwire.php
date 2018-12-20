@@ -70,10 +70,10 @@ class BankWire extends PaymentModule
 			$this->warning = $this->l('No currency has been set for this module.');
 
 		$this->extra_mail_vars = array(
-										'{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
-										'{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
-										'{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
-										);
+		    '{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
+		    '{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
+		    '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
+		);
 	}
 
 	public function install()
@@ -148,9 +148,9 @@ class BankWire extends PaymentModule
 			return;
 
 		$this->smarty->assign(array(
-			'this_path' => $this->_path,
-			'this_path_bw' => $this->_path,
-			'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/'
+		    'this_path' => $this->_path,
+		    'this_path_bw' => $this->_path,
+		    'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/'
 		));
 		return $this->display(__FILE__, 'payment.tpl');
 	}
@@ -164,9 +164,9 @@ class BankWire extends PaymentModule
 			return;
 
 		$payment_options = array(
-			'cta_text' => $this->l('Pay by Bank Wire'),
-			'logo' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/bankwire.jpg'),
-			'action' => $this->context->link->getModuleLink($this->name, 'validation', array(), true)
+		    'cta_text' => $this->l('Pay by Bank Wire'),
+		    'logo' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/bankwire.jpg'),
+		    'action' => $this->context->link->getModuleLink($this->name, 'validation', array(), true)
 		);
 
 		return $payment_options;
@@ -181,12 +181,12 @@ class BankWire extends PaymentModule
 		if (in_array($state, array(Configuration::get('PS_OS_BANKWIRE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID'))))
 		{
 			$this->smarty->assign(array(
-				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
-				'bankwireDetails' => Tools::nl2br($this->details),
-				'bankwireAddress' => Tools::nl2br($this->address),
-				'bankwireOwner' => $this->owner,
-				'status' => 'ok',
-				'id_order' => $params['objOrder']->id
+			    'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
+			    'bankwireDetails' => Tools::nl2br($this->details),
+			    'bankwireAddress' => Tools::nl2br($this->address),
+			    'bankwireOwner' => $this->owner,
+			    'status' => 'ok',
+			    'id_order' => $params['objOrder']->id
 			));
 			if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
 				$this->smarty->assign('reference', $params['objOrder']->reference);
@@ -211,36 +211,36 @@ class BankWire extends PaymentModule
 	public function renderForm()
 	{
 		$fields_form = array(
-			'form' => array(
-				'legend' => array(
-					'title' => $this->l('Contact details'),
-					'icon' => 'icon-envelope'
-				),
-				'input' => array(
-					array(
-						'type' => 'text',
-						'label' => $this->l('Account owner'),
-						'name' => 'BANK_WIRE_OWNER',
-						'required' => true
-					),
-					array(
-						'type' => 'textarea',
-						'label' => $this->l('Details'),
-						'name' => 'BANK_WIRE_DETAILS',
-						'desc' => $this->l('Such as bank branch, IBAN number, BIC, etc.'),
-						'required' => true
-					),
-					array(
-						'type' => 'textarea',
-						'label' => $this->l('Bank address'),
-						'name' => 'BANK_WIRE_ADDRESS',
-						'required' => true
-					),
-				),
-				'submit' => array(
-					'title' => $this->l('Save'),
-				)
-			),
+		    'form' => array(
+		        'legend' => array(
+		            'title' => $this->l('Contact details'),
+		            'icon' => 'icon-envelope'
+		        ),
+		        'input' => array(
+		            array(
+		                'type' => 'text',
+		                'label' => $this->l('Account owner'),
+		                'name' => 'BANK_WIRE_OWNER',
+		                'required' => true
+		            ),
+		            array(
+		                'type' => 'textarea',
+		                'label' => $this->l('Details'),
+		                'name' => 'BANK_WIRE_DETAILS',
+		                'desc' => $this->l('Such as bank branch, IBAN number, BIC, etc.'),
+		                'required' => true
+		            ),
+		            array(
+		                'type' => 'textarea',
+		                'label' => $this->l('Bank address'),
+		                'name' => 'BANK_WIRE_ADDRESS',
+		                'required' => true
+		            ),
+		        ),
+		        'submit' => array(
+		            'title' => $this->l('Save'),
+		        )
+		    ),
 		);
 
 		$helper = new HelperForm();
@@ -256,9 +256,9 @@ class BankWire extends PaymentModule
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->tpl_vars = array(
-			'fields_value' => $this->getConfigFieldsValues(),
-			'languages' => $this->context->controller->getLanguages(),
-			'id_language' => $this->context->language->id
+		    'fields_value' => $this->getConfigFieldsValues(),
+		    'languages' => $this->context->controller->getLanguages(),
+		    'id_language' => $this->context->language->id
 		);
 
 		return $helper->generateForm(array($fields_form));
@@ -267,9 +267,9 @@ class BankWire extends PaymentModule
 	public function getConfigFieldsValues()
 	{
 		return array(
-			'BANK_WIRE_DETAILS' => Tools::getValue('BANK_WIRE_DETAILS', Configuration::get('BANK_WIRE_DETAILS')),
-			'BANK_WIRE_OWNER' => Tools::getValue('BANK_WIRE_OWNER', Configuration::get('BANK_WIRE_OWNER')),
-			'BANK_WIRE_ADDRESS' => Tools::getValue('BANK_WIRE_ADDRESS', Configuration::get('BANK_WIRE_ADDRESS')),
+		    'BANK_WIRE_DETAILS' => Tools::getValue('BANK_WIRE_DETAILS', Configuration::get('BANK_WIRE_DETAILS')),
+		    'BANK_WIRE_OWNER' => Tools::getValue('BANK_WIRE_OWNER', Configuration::get('BANK_WIRE_OWNER')),
+		    'BANK_WIRE_ADDRESS' => Tools::getValue('BANK_WIRE_ADDRESS', Configuration::get('BANK_WIRE_ADDRESS')),
 		);
 	}
 }
