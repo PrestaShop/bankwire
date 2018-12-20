@@ -83,7 +83,7 @@ class BankWire extends PaymentModule
         $this->extra_mail_vars = [
             '{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
             '{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
-            '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
+            '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS')),
         ];
     }
 
@@ -167,7 +167,7 @@ class BankWire extends PaymentModule
         $this->smarty->assign([
             'this_path' => $this->_path,
             'this_path_bw' => $this->_path,
-            'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/'
+            'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
         ]);
 
         return $this->display(__FILE__, 'payment.tpl');
@@ -186,7 +186,7 @@ class BankWire extends PaymentModule
         $payment_options = [
             'cta_text' => $this->l('Pay by Bank Wire'),
             'logo' => Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/bankwire.jpg'),
-            'action' => $this->context->link->getModuleLink($this->name, 'validation', [], true)
+            'action' => $this->context->link->getModuleLink($this->name, 'validation', [], true),
         ];
 
         return $payment_options;
@@ -206,7 +206,7 @@ class BankWire extends PaymentModule
                 'bankwireAddress' => Tools::nl2br($this->address),
                 'bankwireOwner' => $this->owner,
                 'status' => 'ok',
-                'id_order' => $params['objOrder']->id
+                'id_order' => $params['objOrder']->id,
             ]);
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $this->smarty->assign('reference', $params['objOrder']->reference);
@@ -240,32 +240,32 @@ class BankWire extends PaymentModule
             'form' => [
                 'legend' => [
                     'title' => $this->l('Contact details'),
-                    'icon' => 'icon-envelope'
+                    'icon' => 'icon-envelope',
                 ],
                 'input' => [
                     [
                         'type' => 'text',
                         'label' => $this->l('Account owner'),
                         'name' => 'BANK_WIRE_OWNER',
-                        'required' => true
+                        'required' => true,
                     ],
                     [
                         'type' => 'textarea',
                         'label' => $this->l('Details'),
                         'name' => 'BANK_WIRE_DETAILS',
                         'desc' => $this->l('Such as bank branch, IBAN number, BIC, etc.'),
-                        'required' => true
+                        'required' => true,
                     ],
                     [
                         'type' => 'textarea',
                         'label' => $this->l('Bank address'),
                         'name' => 'BANK_WIRE_ADDRESS',
-                        'required' => true
+                        'required' => true,
                     ],
                 ],
                 'submit' => [
                     'title' => $this->l('Save'),
-                ]
+                ],
             ],
         ];
 
@@ -284,7 +284,7 @@ class BankWire extends PaymentModule
         $helper->tpl_vars = [
             'fields_value' => $this->getConfigFieldsValues(),
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
+            'id_language' => $this->context->language->id,
         ];
 
         return $helper->generateForm([$fields_form]);
