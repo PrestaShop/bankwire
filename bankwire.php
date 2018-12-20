@@ -36,6 +36,7 @@ class BankWire extends PaymentModule
 	public $owner;
 	public $address;
 	public $extra_mail_vars;
+
 	public function __construct()
 	{
 		$this->name = 'bankwire';
