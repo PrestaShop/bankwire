@@ -27,9 +27,9 @@
 /**
  * @deprecated 1.5.0 This file is deprecated, use moduleFrontController instead
  */
-include(__DIR__.'/../../config/config.inc.php');
-include(__DIR__.'/../../header.php');
-include(__DIR__.'/../../init.php');
+include(__DIR__ . '/../../config/config.inc.php');
+include(__DIR__ . '/../../header.php');
+include(__DIR__ . '/../../init.php');
 
 $context = Context::getContext();
 $cart = $context->cart;
@@ -64,4 +64,4 @@ $total = (float) ($cart->getOrderTotal(true, Cart::BOTH));
 $bankwire->validateOrder($cart->id, Configuration::get('PS_OS_BANKWIRE'), $total, $bankwire->displayName, NULL, [], (int) $currency->id, false, $customer->secure_key);
 
 $order = new Order($bankwire->currentOrder);
-Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$bankwire->id.'&id_order='.$bankwire->currentOrder.'&key='.$customer->secure_key);
+Tools::redirect('index.php?controller=order-confirmation&id_cart=' . $cart->id . '&id_module=' . $bankwire->id . '&id_order=' . $bankwire->currentOrder . '&key=' . $customer->secure_key);
