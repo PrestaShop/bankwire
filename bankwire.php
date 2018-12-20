@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_'))
 class BankWire extends PaymentModule
 {
 	protected $_html = '';
-	protected $_postErrors = array();
+	protected $_postErrors = [];
 
 	public $details;
 	public $owner;
@@ -42,13 +42,13 @@ class BankWire extends PaymentModule
 		$this->tab = 'payments_gateways';
 		$this->version = '1.1.2';
 		$this->author = 'PrestaShop';
-		$this->controllers = array('payment', 'validation');
+		$this->controllers = ['payment', 'validation'];
 		$this->is_eu_compatible = 1;
 
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';
 
-		$config = Configuration::getMultiple(array('BANK_WIRE_DETAILS', 'BANK_WIRE_OWNER', 'BANK_WIRE_ADDRESS'));
+		$config = Configuration::getMultiple(['BANK_WIRE_DETAILS', 'BANK_WIRE_OWNER', 'BANK_WIRE_ADDRESS']);
 		if (!empty($config['BANK_WIRE_OWNER']))
 			$this->owner = $config['BANK_WIRE_OWNER'];
 		if (!empty($config['BANK_WIRE_DETAILS']))
@@ -62,18 +62,18 @@ class BankWire extends PaymentModule
 		$this->displayName = $this->l('Bank wire');
 		$this->description = $this->l('Accept payments for your products via bank wire transfer.');
 		$this->confirmUninstall = $this->l('Are you sure about removing these details?');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
+		$this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.6.99.99'];
 
 		if (!isset($this->owner) || !isset($this->details) || !isset($this->address))
 			$this->warning = $this->l('Account owner and account details must be configured before using this module.');
 		if (!count(Currency::checkPaymentCurrencies($this->id)))
 			$this->warning = $this->l('No currency has been set for this module.');
 
-		$this->extra_mail_vars = array(
+		$this->extra_mail_vars = [
 		    '{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
 		    '{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
 		    '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
-		);
+		];
 	}
 
 	public function install()
@@ -147,11 +147,11 @@ class BankWire extends PaymentModule
 		if (!$this->checkCurrency($params['cart']))
 			return;
 
-		$this->smarty->assign(array(
+		$this->smarty->assign([
 		    'this_path' => $this->_path,
 		    'this_path_bw' => $this->_path,
 		    'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/'
-		));
+		]);
 		return $this->display(__FILE__, 'payment.tpl');
 	}
 
@@ -163,11 +163,11 @@ class BankWire extends PaymentModule
 		if (!$this->checkCurrency($params['cart']))
 			return;
 
-		$payment_options = array(
+		$payment_options = [
 		    'cta_text' => $this->l('Pay by Bank Wire'),
 		    'logo' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/bankwire.jpg'),
-		    'action' => $this->context->link->getModuleLink($this->name, 'validation', array(), true)
-		);
+		    'action' => $this->context->link->getModuleLink($this->name, 'validation', [], true)
+		];
 
 		return $payment_options;
 	}
@@ -178,16 +178,16 @@ class BankWire extends PaymentModule
 			return;
 
 		$state = $params['objOrder']->getCurrentState();
-		if (in_array($state, array(Configuration::get('PS_OS_BANKWIRE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID'))))
+		if (in_array($state, [Configuration::get('PS_OS_BANKWIRE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')]))
 		{
-			$this->smarty->assign(array(
+			$this->smarty->assign([
 			    'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
 			    'bankwireDetails' => Tools::nl2br($this->details),
 			    'bankwireAddress' => Tools::nl2br($this->address),
 			    'bankwireOwner' => $this->owner,
 			    'status' => 'ok',
 			    'id_order' => $params['objOrder']->id
-			));
+			]);
 			if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
 				$this->smarty->assign('reference', $params['objOrder']->reference);
 		}
@@ -210,38 +210,38 @@ class BankWire extends PaymentModule
 
 	public function renderForm()
 	{
-		$fields_form = array(
-		    'form' => array(
-		        'legend' => array(
+		$fields_form = [
+		    'form' => [
+		        'legend' => [
 		            'title' => $this->l('Contact details'),
 		            'icon' => 'icon-envelope'
-		        ),
-		        'input' => array(
-		            array(
+		        ],
+		        'input' => [
+		            [
 		                'type' => 'text',
 		                'label' => $this->l('Account owner'),
 		                'name' => 'BANK_WIRE_OWNER',
 		                'required' => true
-		            ),
-		            array(
+		            ],
+		            [
 		                'type' => 'textarea',
 		                'label' => $this->l('Details'),
 		                'name' => 'BANK_WIRE_DETAILS',
 		                'desc' => $this->l('Such as bank branch, IBAN number, BIC, etc.'),
 		                'required' => true
-		            ),
-		            array(
+		            ],
+		            [
 		                'type' => 'textarea',
 		                'label' => $this->l('Bank address'),
 		                'name' => 'BANK_WIRE_ADDRESS',
 		                'required' => true
-		            ),
-		        ),
-		        'submit' => array(
+		            ],
+		        ],
+		        'submit' => [
 		            'title' => $this->l('Save'),
-		        )
-		    ),
-		);
+		        ]
+		    ],
+		];
 
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
@@ -249,27 +249,27 @@ class BankWire extends PaymentModule
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-		$this->fields_form = array();
+		$this->fields_form = [];
 		$helper->id = (int)Tools::getValue('id_carrier');
 		$helper->identifier = $this->identifier;
 		$helper->submit_action = 'btnSubmit';
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
-		$helper->tpl_vars = array(
+		$helper->tpl_vars = [
 		    'fields_value' => $this->getConfigFieldsValues(),
 		    'languages' => $this->context->controller->getLanguages(),
 		    'id_language' => $this->context->language->id
-		);
+		];
 
-		return $helper->generateForm(array($fields_form));
+		return $helper->generateForm([$fields_form]);
 	}
 
 	public function getConfigFieldsValues()
 	{
-		return array(
+		return [
 		    'BANK_WIRE_DETAILS' => Tools::getValue('BANK_WIRE_DETAILS', Configuration::get('BANK_WIRE_DETAILS')),
 		    'BANK_WIRE_OWNER' => Tools::getValue('BANK_WIRE_OWNER', Configuration::get('BANK_WIRE_OWNER')),
 		    'BANK_WIRE_ADDRESS' => Tools::getValue('BANK_WIRE_ADDRESS', Configuration::get('BANK_WIRE_ADDRESS')),
-		);
+		];
 	}
 }
