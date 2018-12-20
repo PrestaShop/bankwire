@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
+if ( ! defined('_PS_VERSION_'))
 	exit;
 
 function upgrade_module_1_0_8($module)

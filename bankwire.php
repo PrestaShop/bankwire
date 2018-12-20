@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
+if ( ! defined('_PS_VERSION_'))
 	exit;
 
 class BankWire extends PaymentModule
@@ -50,11 +50,11 @@ class BankWire extends PaymentModule
 		$this->currencies_mode = 'checkbox';
 
 		$config = Configuration::getMultiple(['BANK_WIRE_DETAILS', 'BANK_WIRE_OWNER', 'BANK_WIRE_ADDRESS']);
-		if (!empty($config['BANK_WIRE_OWNER']))
+		if ( ! empty($config['BANK_WIRE_OWNER']))
 			$this->owner = $config['BANK_WIRE_OWNER'];
-		if (!empty($config['BANK_WIRE_DETAILS']))
+		if ( ! empty($config['BANK_WIRE_DETAILS']))
 			$this->details = $config['BANK_WIRE_DETAILS'];
-		if (!empty($config['BANK_WIRE_ADDRESS']))
+		if ( ! empty($config['BANK_WIRE_ADDRESS']))
 			$this->address = $config['BANK_WIRE_ADDRESS'];
 
 		$this->bootstrap = true;
@@ -65,9 +65,9 @@ class BankWire extends PaymentModule
 		$this->confirmUninstall = $this->l('Are you sure about removing these details?');
 		$this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.6.99.99'];
 
-		if (!isset($this->owner) || !isset($this->details) || !isset($this->address))
+		if ( ! isset($this->owner) || ! isset($this->details) || ! isset($this->address))
 			$this->warning = $this->l('Account owner and account details must be configured before using this module.');
-		if (!count(Currency::checkPaymentCurrencies($this->id)))
+		if ( ! count(Currency::checkPaymentCurrencies($this->id)))
 			$this->warning = $this->l('No currency has been set for this module.');
 
 		$this->extra_mail_vars = [
@@ -79,17 +79,17 @@ class BankWire extends PaymentModule
 
 	public function install()
 	{
-		if (!parent::install() || !$this->registerHook('payment') || ! $this->registerHook('displayPaymentEU') || !$this->registerHook('paymentReturn'))
+		if ( ! parent::install() || ! $this->registerHook('payment') || ! $this->registerHook('displayPaymentEU') || ! $this->registerHook('paymentReturn'))
 			return false;
 		return true;
 	}
 
 	public function uninstall()
 	{
-		if (!Configuration::deleteByName('BANK_WIRE_DETAILS')
-				|| !Configuration::deleteByName('BANK_WIRE_OWNER')
-				|| !Configuration::deleteByName('BANK_WIRE_ADDRESS')
-				|| !parent::uninstall())
+		if ( ! Configuration::deleteByName('BANK_WIRE_DETAILS')
+				|| ! Configuration::deleteByName('BANK_WIRE_OWNER')
+				|| ! Configuration::deleteByName('BANK_WIRE_ADDRESS')
+				|| ! parent::uninstall())
 			return false;
 		return true;
 	}
@@ -98,9 +98,9 @@ class BankWire extends PaymentModule
 	{
 		if (Tools::isSubmit('btnSubmit'))
 		{
-			if (!Tools::getValue('BANK_WIRE_DETAILS'))
+			if ( ! Tools::getValue('BANK_WIRE_DETAILS'))
 				$this->_postErrors[] = $this->l('Account details are required.');
-			elseif (!Tools::getValue('BANK_WIRE_OWNER'))
+			elseif ( ! Tools::getValue('BANK_WIRE_OWNER'))
 				$this->_postErrors[] = $this->l('Account owner is required.');
 		}
 	}
@@ -126,7 +126,7 @@ class BankWire extends PaymentModule
 		if (Tools::isSubmit('btnSubmit'))
 		{
 			$this->_postValidation();
-			if (!count($this->_postErrors))
+			if ( ! count($this->_postErrors))
 				$this->_postProcess();
 			else
 				foreach ($this->_postErrors as $err)
@@ -143,9 +143,9 @@ class BankWire extends PaymentModule
 
 	public function hookPayment($params)
 	{
-		if (!$this->active)
+		if ( ! $this->active)
 			return;
-		if (!$this->checkCurrency($params['cart']))
+		if ( ! $this->checkCurrency($params['cart']))
 			return;
 
 		$this->smarty->assign([
@@ -158,10 +158,10 @@ class BankWire extends PaymentModule
 
 	public function hookDisplayPaymentEU($params)
 	{
-		if (!$this->active)
+		if ( ! $this->active)
 			return;
 
-		if (!$this->checkCurrency($params['cart']))
+		if ( ! $this->checkCurrency($params['cart']))
 			return;
 
 		$payment_options = [
@@ -175,7 +175,7 @@ class BankWire extends PaymentModule
 
 	public function hookPaymentReturn($params)
 	{
-		if (!$this->active)
+		if ( ! $this->active)
 			return;
 
 		$state = $params['objOrder']->getCurrentState();
@@ -189,7 +189,7 @@ class BankWire extends PaymentModule
 			    'status' => 'ok',
 			    'id_order' => $params['objOrder']->id
 			]);
-			if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
+			if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference))
 				$this->smarty->assign('reference', $params['objOrder']->reference);
 		}
 		else

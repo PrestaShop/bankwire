@@ -40,7 +40,7 @@ class BankwirePaymentModuleFrontController extends ModuleFrontController
 		parent::initContent();
 
 		$cart = $this->context->cart;
-		if (!$this->module->checkCurrency($cart))
+		if ( ! $this->module->checkCurrency($cart))
 			Tools::redirect('index.php?controller=order');
 
 		$this->context->smarty->assign([
