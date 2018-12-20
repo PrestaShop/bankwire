@@ -44,6 +44,7 @@ foreach (Module::getPaymentModules() as $module)
 	if ($module['name'] == 'bankwire')
 	{
 		$authorized = true;
+
 		break;
 	}
 if ( ! $authorized)

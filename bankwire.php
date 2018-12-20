@@ -81,6 +81,7 @@ class BankWire extends PaymentModule
 	{
 		if ( ! parent::install() || ! $this->registerHook('payment') || ! $this->registerHook('displayPaymentEU') || ! $this->registerHook('paymentReturn'))
 			return false;
+
 		return true;
 	}
 
@@ -91,6 +92,7 @@ class BankWire extends PaymentModule
 				|| ! Configuration::deleteByName('BANK_WIRE_ADDRESS')
 				|| ! parent::uninstall())
 			return false;
+
 		return true;
 	}
 
@@ -153,6 +155,7 @@ class BankWire extends PaymentModule
 		    'this_path_bw' => $this->_path,
 		    'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/'
 		]);
+
 		return $this->display(__FILE__, 'payment.tpl');
 	}
 
@@ -194,6 +197,7 @@ class BankWire extends PaymentModule
 		}
 		else
 			$this->smarty->assign('status', 'failed');
+
 		return $this->display(__FILE__, 'payment_return.tpl');
 	}
 
@@ -206,6 +210,7 @@ class BankWire extends PaymentModule
 			foreach ($currencies_module as $currency_module)
 				if ($currency_order->id == $currency_module['id_currency'])
 					return true;
+
 		return false;
 	}
 

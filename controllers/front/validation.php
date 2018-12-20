@@ -44,6 +44,7 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 			if ($module['name'] == 'bankwire')
 			{
 				$authorized = true;
+
 				break;
 			}
 		if ( ! $authorized)
